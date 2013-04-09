@@ -37,19 +37,24 @@
     <PropertyGroup>
       <OctoPackPackageVersion Condition="'$(OctoPackPackageVersion)' == ''"><!-- Use the value from nuspec, or 1.0.0 if not in NuSpec --></OctoPackPackageVersion>
     </PropertyGroup>
+      <PropertyGroup>
+          <OctoPackDirectoryToPack Condition="'$(ExeProjectOutputDir)' != ''">$(ExeProjectOutputDir)</OctoPackDirectoryToPack>
+          <OctoPackDirectoryToPack Condition="'$(WebProjectOutputDir)' != ''">$(WebProjectOutputDir)</OctoPackDirectoryToPack>
+      </PropertyGroup>
 
     <Message Text="Using package version: $(OctoPackPackageVersion)" />
 
-    <CreateOctoPackPackage
-      NuSpecFileName="$(OctoPackNuSpecFileName)"
-      ContentFiles="@(Content)"
-      OutDir="$(OutDir)"
-      ProjectDirectory="$(MSBuildProjectDirectory)"
-      ProjectName="$(MSBuildProjectName)"
-      PackageVersion="$(OctoPackPackageVersion)"
-      PrimaryOutputAssembly="$(TargetPath)"
-      ReleaseNotesFile="$(OctoPackReleaseNotesFile)"
-      NuGetExePath="$(OctoPackNuGetExePath)"
+      <CreateOctoPackPackage
+        NuSpecFileName="$(OctoPackNuSpecFileName)"
+        TreadEveryProjectAsApplication="true"
+        ContentFiles="@(Content)"
+        OutDir="$(OctoPackDirectoryToPack)"
+        ProjectDirectory="$(MSBuildProjectDirectory)"
+        ProjectName="$(MSBuildProjectName)"
+        PackageVersion="$(OctoPackPackageVersion)"
+        PrimaryOutputAssembly="$(TargetPath)"
+        ReleaseNotesFile="$(OctoPackReleaseNotesFile)"
+        NuGetExePath="$(OctoPackNuGetExePath)"
       >
       <Output TaskParameter="Packages" ItemName="OctoPackBuiltPackages" />
       <Output TaskParameter="NuGetExePath" PropertyName="OctoPackNuGetExePath" />

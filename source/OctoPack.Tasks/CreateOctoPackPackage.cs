@@ -21,8 +21,9 @@ namespace OctoPack.Tasks
     public class CreateOctoPackPackage : AbstractTask
     {
         private readonly IOctopusFileSystem fileSystem;
-        
-        public CreateOctoPackPackage() : this(new OctopusPhysicalFileSystem())
+
+        public CreateOctoPackPackage()
+            : this(new OctopusPhysicalFileSystem())
         {
         }
 
@@ -30,6 +31,8 @@ namespace OctoPack.Tasks
         {
             this.fileSystem = fileSystem;
         }
+
+        public bool TreadEveryProjectAsApplication { get; set; }
 
         /// <summary>
         /// Allows the name of the NuSpec file to be overridden. If empty, defaults to <see cref="ProjectName"/>.nuspec.
@@ -125,11 +128,13 @@ namespace OctoPack.Tasks
                         where !file.EndsWith(".vshost.exe.config", StringComparison.OrdinalIgnoreCase)
                         where !file.EndsWith(".vshost.exe.manifest", StringComparison.OrdinalIgnoreCase)
                         where !file.EndsWith(".vshost.pdb", StringComparison.OrdinalIgnoreCase)
-                        where file.IndexOf("\\_publishedwebsites", StringComparison.OrdinalIgnoreCase) < 0
                         select file;
+
+                    
 
                     if (IsWebApplication())
                     {
+                        binaries = binaries.Where(file=> file.IndexOf("\\_publishedwebsites", StringComparison.OrdinalIgnoreCase) < 0);
                         LogMessage("Packaging an ASP.NET web application");
 
                         LogMessage("Add content files", MessageImportance.Normal);
@@ -158,7 +163,7 @@ namespace OctoPack.Tasks
 
                 LogMessage("OctoPack successful");
 
-                return true;                
+                return true;
             }
             catch (Exception ex)
             {
@@ -339,9 +344,9 @@ namespace OctoPack.Tasks
 
         private bool IsWebApplication()
         {
-            return fileSystem.FileExists("web.config");
+            return fileSystem.FileExists("web.config") && !TreadEveryProjectAsApplication;
         }
-        
+
         private void Copy(IEnumerable<string> sourceFiles, string baseDirectory, string destinationDirectory)
         {
             foreach (var source in sourceFiles)
@@ -421,7 +426,7 @@ namespace OctoPack.Tasks
             {
                 {"Name", Path.GetFileName(packageFile)}
             };
-            
+
             return new TaskItem(packageFile, metadata);
         }
     }
