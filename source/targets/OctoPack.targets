@@ -47,6 +47,7 @@
       <CreateOctoPackPackage
         NuSpecFileName="$(OctoPackNuSpecFileName)"
         TreadEveryProjectAsApplication="true"
+        GetVersionFromAssemblyFileVersion="true"
         ContentFiles="@(Content)"
         OutDir="$(OctoPackDirectoryToPack)"
         ProjectDirectory="$(MSBuildProjectDirectory)"

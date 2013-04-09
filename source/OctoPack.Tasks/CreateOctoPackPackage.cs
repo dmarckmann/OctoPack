@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using OctoPack.Tasks.Util;
+using System.Reflection;
 
 namespace OctoPack.Tasks
 {
@@ -33,6 +34,8 @@ namespace OctoPack.Tasks
         }
 
         public bool TreadEveryProjectAsApplication { get; set; }
+
+        public bool GetVersionFromAssemblyFileVersion { get; set; }
 
         /// <summary>
         /// Allows the name of the NuSpec file to be overridden. If empty, defaults to <see cref="ProjectName"/>.nuspec.
@@ -95,6 +98,9 @@ namespace OctoPack.Tasks
         {
             try
             {
+                if (GetVersionFromAssemblyFileVersion) 
+                    PackageVersion = GetAssemblyFileVersion();
+
                 LogDiagnostics();
 
                 FindNuGet();
@@ -172,6 +178,14 @@ namespace OctoPack.Tasks
                 return false;
             }
         }
+
+        private string GetAssemblyFileVersion()
+        {
+            string version = Assembly.LoadFile(PrimaryOutputAssembly).GetFileVersion();
+            LogMessage("AssemblyFileVersion: " + version, MessageImportance.Normal);
+            return version;
+        }
+     
 
         private void LogDiagnostics()
         {
